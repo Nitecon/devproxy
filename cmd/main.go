@@ -43,23 +43,18 @@ func RouterHandler(w http.ResponseWriter, r *http.Request) {
 			plen := len(path)
 			// if r.Url.Path starts with path, then redirect to the server
 			if len(r.URL.Path) >= plen && r.URL.Path[:plen] == path {
-				body, headers, status := SendRequest(server, r)
-				// set the headers
-				for key, value := range headers {
-					for _, v := range value {
-						w.Header().Add(key, v)
-					}
-				}
-				// write the response body
-				w.Write(body)
-				log.Info().Msgf("[%s] - (%s:%d) - %s", server.Name, r.Method, status, r.RequestURI)
+				WriteResponse(w, r, server)
 				return
 			}
 		}
 	}
 	// ifno server is found SendRequest to the deafault server
-	default_server := Server{Port: config.DefaultPort, Name: "default"}
-	body, headers, status := SendRequest(default_server, r)
+	default_server := Server{Port: config.DefaultPort, Name: "_default_"}
+	WriteResponse(w, r, default_server)
+}
+
+func WriteResponse(w http.ResponseWriter, r *http.Request, server Server) {
+	body, headers, status := SendRequest(server, r)
 	// set the headers
 	for key, value := range headers {
 		for _, v := range value {
@@ -68,14 +63,14 @@ func RouterHandler(w http.ResponseWriter, r *http.Request) {
 	}
 	// write the response body
 	w.Write(body)
-	log.Info().Msgf("[%s] - (%s:%d) - %s", "default", r.Method, status, r.RequestURI)
+	log.Info().Msgf("[%s] - (%s:%d) - %s", server.Name, r.Method, status, r.RequestURI)
 }
 
 func SendRequest(server Server, r *http.Request) (body []byte, headerMap map[string][]string, status int) {
 	// create a new http client
 	client := &http.Client{}
 	// create a new request
-	req, err := http.NewRequest(r.Method, fmt.Sprintf("http://localhost:%d%s", server.Port, r.URL.Path), r.Body)
+	req, err := http.NewRequest(r.Method, fmt.Sprintf("http://localhost:%d%s", server.Port, r.RequestURI), r.Body)
 	if err != nil {
 		log.Fatal().Err(err).Msgf("Failed to create a new request to %s", server.Name)
 	}
