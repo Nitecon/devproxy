@@ -1,0 +1,13 @@
+---
+listen_port: 8080
+default_port: 3000 
+servers:
+- name: API
+  path:
+    - /api
+    - /_oauth
+  port: 8888
+#- name: ExtraSvr
+#  path:
+#    - /foo
+#  port: 3000
