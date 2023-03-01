@@ -42,7 +42,7 @@ func RouterHandler(w http.ResponseWriter, r *http.Request) {
 		for _, path := range server.Path {
 			plen := len(path)
 			// if r.Url.Path starts with path, then redirect to the server
-			if r.URL.Path[:plen] == path {
+			if len(r.URL.Path) >= plen && r.URL.Path[:plen] == path {
 				body, headers, status := SendRequest(server, r)
 				// set the headers
 				for key, value := range headers {
