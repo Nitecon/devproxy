@@ -3,7 +3,7 @@ module github.com/Nitecon/devproxy
 go 1.19
 
 require (
-	github.com/rs/zerolog v1.29.0
+	github.com/rs/zerolog v1.29.1
 	gopkg.in/yaml.v2 v2.4.0
 )
 
